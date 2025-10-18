@@ -46,6 +46,7 @@ from awscli.clidriver import (
 )
 from awscli.compat import StringIO
 from awscli.customizations.commands import BasicCommand
+from awscli.logger import _reset_crt_logging_state
 from awscli.paramfile import URIArgumentHandler
 from awscli.testutils import BaseAWSCommandParamsTest, mock, unittest
 
@@ -398,6 +399,7 @@ class TestCliDriver:
 
     @mock.patch('awscrt.io.init_logging')
     def test_debug_enables_crt_logging(self, mock_init_logging):
+        _reset_crt_logging_state()
         with contextlib.redirect_stderr(io.StringIO()):
             self.driver.main(
                 ['s3', 'list-objects', '--bucket', 'foo', '--debug']
@@ -408,6 +410,7 @@ class TestCliDriver:
 
     @mock.patch('awscrt.io.init_logging')
     def test_no_debug_disables_crt_logging(self, mock_init_logging):
+        _reset_crt_logging_state()
         self.driver.main(['s3', 'list-objects', '--bucket', 'foo'])
         mock_init_logging.assert_called_with(
             awscrt.io.LogLevel.NoLogs, 'stderr'

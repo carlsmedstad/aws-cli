@@ -15,6 +15,7 @@ import logging
 import awscrt.io
 
 from awscli.logger import (
+    _reset_crt_logging_state,
     disable_crt_logging,
     enable_crt_logging,
     remove_stream_logger,
@@ -49,6 +50,7 @@ class TestLogger(unittest.TestCase):
 
     @mock.patch('awscrt.io.init_logging')
     def test_can_enable_crt_logging(self, mock_init_logging):
+        _reset_crt_logging_state()
         enable_crt_logging()
         mock_init_logging.assert_called_with(
             awscrt.io.LogLevel.Debug, 'stderr'
@@ -56,6 +58,7 @@ class TestLogger(unittest.TestCase):
 
     @mock.patch('awscrt.io.init_logging')
     def test_can_disable_crt_logging(self, mock_init_logging):
+        _reset_crt_logging_state()
         disable_crt_logging()
         mock_init_logging.assert_called_with(
             awscrt.io.LogLevel.NoLogs, 'stderr'

@@ -16,6 +16,10 @@ import awscrt.io
 
 LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 
+# Track whether we've initialized CRT logging to avoid re-initialization
+# In awscrt v0.28.2+, init_logging() can only be called once
+_crt_logging_initialized = False
+
 
 def set_stream_logger(logger_name, log_level, stream=None, format_string=None):
     """
@@ -77,8 +81,19 @@ def remove_stream_logger(logger_name):
 
 
 def enable_crt_logging():
-    awscrt.io.init_logging(awscrt.io.LogLevel.Debug, 'stderr')
+    global _crt_logging_initialized
+    if not _crt_logging_initialized:
+        awscrt.io.init_logging(awscrt.io.LogLevel.Debug, 'stderr')
+        _crt_logging_initialized = True
 
 
 def disable_crt_logging():
-    awscrt.io.init_logging(awscrt.io.LogLevel.NoLogs, 'stderr')
+    global _crt_logging_initialized
+    if not _crt_logging_initialized:
+        awscrt.io.init_logging(awscrt.io.LogLevel.NoLogs, 'stderr')
+        _crt_logging_initialized = True
+
+
+def _reset_crt_logging_state():
+    global _crt_logging_initialized
+    _crt_logging_initialized = False
